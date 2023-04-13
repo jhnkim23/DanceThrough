@@ -1,24 +1,40 @@
-import logo from './logo.svg';
 import './App.css';
+
+function VidSubmit() {
+  function VidUpload() {
+    return (
+      <>
+        <label htmlFor="myfile">Select a file:</label>
+        <input type="file" id="myfile" name="myfile"></input>
+      </>
+    )
+  }
+  
+  function VidButton() {
+    function handleClick() {
+      let fileInput = document.getElementById('myfile');
+      let selectedFile = fileInput.files[0];
+      console.log(selectedFile);
+    }
+  
+    return (
+      <button onClick={handleClick}>
+        Press this button DanceThrough-ify!
+      </button>
+    )
+  }
+
+  return (
+    <>
+      <VidUpload />
+      <VidButton />
+    </>
+  )
+}
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <VidSubmit />
   );
 }
 
