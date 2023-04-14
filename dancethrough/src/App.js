@@ -1,4 +1,5 @@
 import './App.css';
+import axios from 'axios';
 
 function VidSubmit() {
   function VidUpload() {
@@ -12,9 +13,23 @@ function VidSubmit() {
   
   function VidButton() {
     function handleClick() {
-      let fileInput = document.getElementById('myfile');
-      let selectedFile = fileInput.files[0];
-      console.log(selectedFile);
+      let fileInput = document.getElementById('myfile')
+      let selectedFile = fileInput.files[0]
+
+      let formData = new FormData()
+      formData.append('vidUpload', selectedFile)
+
+      console.log(formData)
+
+      axios({
+        method: 'post',
+        url: '/upload',
+        data: formData
+      })
+      .then(function(response) {
+        console.log(response.data)
+      })
+
     }
   
     return (
