@@ -1,4 +1,4 @@
-import cv2 as cv 
+import cv2 as cv
 import numpy as np
 
 BODY_PARTS = { "Nose": 0, "Neck": 1, "RShoulder": 2, "RElbow": 3, "RWrist": 4,
@@ -12,5 +12,59 @@ POSE_PAIRS = [ ["Neck", "RShoulder"], ["Neck", "LShoulder"], ["RShoulder", "RElb
                ["LHip", "LKnee"], ["LKnee", "LAnkle"], ["Neck", "Nose"], ["Nose", "REye"],
                ["REye", "REar"], ["Nose", "LEye"], ["LEye", "LEar"] ]
 
-def compute_poses(): #INSIDE PARAM WILL BE FILE PATH TO VIDEO STORED FROM FRONTEND
-    return
+image_width=600
+image_height=600
+FILE_PATH = './vids/'
+
+def compute_poses(file_name): #INSIDE PARAM WILL BE FILE PATH TO VIDEO STORED FROM FRONTEND
+    complete_file_path = FILE_PATH + file_name
+
+    net = cv.dnn.readNetFromTensorflow("graph_opt.pb")
+
+    threshold=0.2
+
+    img = cv.imread(complete_file_path, cv.IMREAD_UNCHANGED)
+
+    photo_height=img.shape[0]
+    photo_width=img.shape[1]
+    net.setInput(cv.dnn.blobFromImage(img, 1.0, (image_width, image_height), (127.5, 127.5, 127.5), swapRB=True, crop=False))
+
+    out = net.forward()
+    out = out[:, :19, :, :]
+
+    assert(len(BODY_PARTS) == out.shape[1])
+
+    points = []
+    for i in range(len(BODY_PARTS)):
+            # Slice heatmap of corresponging body's part.
+        heatMap = out[0, i, :, :]
+
+            # Originally, we try to find all the local maximums. To simplify a sample
+            # we just find a global one. However only a single pose at the same time
+            # could be detected this way.
+        _, conf, _, point = cv.minMaxLoc(heatMap)
+        x = (photo_width * point[0]) / out.shape[3]
+        y = (photo_height * point[1]) / out.shape[2]
+        # Add a point if it's confidence is higher than threshold.
+        points.append((int(x), int(y)) if conf > threshold else None)
+
+
+    for pair in POSE_PAIRS:
+        partFrom = pair[0]
+        partTo = pair[1]
+        assert(partFrom in BODY_PARTS)
+        assert(partTo in BODY_PARTS)
+
+        idFrom = BODY_PARTS[partFrom]
+        idTo = BODY_PARTS[partTo]
+
+        if points[idFrom] and points[idTo]:
+            cv.line(img, points[idFrom], points[idTo], (0, 255, 0), 3)
+            cv.ellipse(img, points[idFrom], (3, 3), 0, 0, 360, (0, 0, 255), cv.FILLED)
+            cv.ellipse(img, points[idTo], (3, 3), 0, 0, 360, (0, 0, 255), cv.FILLED)
+
+    t, _ = net.getPerfProfile()
+
+    cv.imwrite("./saved/openposed.jpg", img)
+
+    return 'successfully completed poses'

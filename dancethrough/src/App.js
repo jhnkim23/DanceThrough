@@ -1,44 +1,51 @@
 import './App.css';
-import axios from 'axios';
+import React from 'react';
+import $ from 'jquery';
+
+function VidUpload() {
+  return (
+    <>
+      <label htmlFor="myfile" encType="multipart/form-data">Select a file:</label>
+      <input type="file" id="myfile" name="myfile"></input>
+    </>
+  );
+}
+
+function VidButton() {
+  function handleClick() {
+    let fileInput = document.getElementById('myfile').files[0]
+    console.log(fileInput)
+    let vid_send = new FormData()
+    vid_send.append('file', fileInput)
+
+    $.ajax ({
+      type: "POST",
+      enctype: 'multipart/form-data',
+      url: "/upload",
+      data: vid_send,
+      processData: false,
+      contentType: false,
+      success: function(resp){
+        console.log(resp);
+      }
+    }).then(
+      $.ajax ({
+        type: "POST",
+        enctype: "multipart/form-data",
+        url: "/compute_poses",
+        data: {'name': fileInput.name},
+      })
+    );
+  }
+
+  return (
+    <button onClick={handleClick}>
+      Press this button DanceThrough-ify!
+    </button>
+  );
+}
 
 function VidSubmit() {
-  function VidUpload() {
-    return (
-      <>
-        <label htmlFor="myfile">Select a file:</label>
-        <input type="file" id="myfile" name="myfile"></input>
-      </>
-    )
-  }
-  
-  function VidButton() {
-    function handleClick() {
-      let fileInput = document.getElementById('myfile')
-      let selectedFile = fileInput.files[0]
-
-      let formData = new FormData()
-      formData.append('vidUpload', selectedFile)
-
-      console.log(formData)
-
-      axios({
-        method: 'post',
-        url: '/upload',
-        data: formData
-      })
-      .then(function(response) {
-        console.log(response.data)
-      })
-
-    }
-  
-    return (
-      <button onClick={handleClick}>
-        Press this button DanceThrough-ify!
-      </button>
-    )
-  }
-
   return (
     <>
       <VidUpload />
@@ -47,10 +54,8 @@ function VidSubmit() {
   )
 }
 
-function App() {
+export default function App() {
   return (
     <VidSubmit />
   );
 }
-
-export default App;
