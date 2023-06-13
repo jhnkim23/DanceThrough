@@ -1,6 +1,6 @@
-# Getting Started with Create React App
+# DanceThrough
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+The intended purpose of this project is to aid users in learning a dance of their choice. The program asks the user for a youtube video url or mp4 file submission of a dance. Pose estimation will be run on the inputted video and the program will output in frontend an interactive overlay where users try to match the poses calculated based on every 8 beat counts.
 
 # Running Program
 
