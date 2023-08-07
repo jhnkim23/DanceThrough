@@ -1,3 +1,0 @@
-[submodule "dancethrough/backend/yolov7-pose-estimation"]
-	path = dancethrough/backend/yolov7-pose-estimation
-	url = https://github.com/RizwanMunawar/yolov7-pose-estimation
